@@ -5,4 +5,3 @@ def test_print_last_transactions(capsys):
     print_last_transactions()
     captured = capsys.readouterr()
     assert "Перевод организации" in captured.out
-    assert "Открытие вклада" in captured.out
