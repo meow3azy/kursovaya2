@@ -13,15 +13,19 @@ def print_transaction(operation):
     currency = operation['operationAmount']['currency']['name']
 
     if 'from' in operation:
-        if from_account.startswith('Visa') or from_account.startswith('Maestro'):
+        if 'Visa' in from_account or 'Maestro' in from_account or 'MasterCard' in from_account or 'American Express' in from_account:
             from_account = mask_card_number(from_account)
         else:
             from_account = mask_account_number(from_account)
-
-    to_account = mask_account_number(to_account)
+        from_account_str = f"{from_account} -> Счет {mask_account_number(to_account)}"
+    else:
+        from_account_str = f"{mask_account_number(to_account)}"
 
     print(f"{date} {description}")
-    print(f"{from_account} -> Счет {to_account}")
+    if "->" in from_account_str:
+        print(f"{from_account_str}")
+    else:
+        print(f"Счет: {from_account_str}")
     print(f"{amount} {currency}\n")
 
 
