@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 from src.masked import mask_card_number, mask_account_number
 
@@ -15,10 +14,7 @@ def load_operations(file_path):
 def print_transaction(operation):
     date = datetime.strptime(operation['date'], '%Y-%m-%dT%H:%M:%S.%f').strftime('%d.%m.%Y')
     description = operation.get('description', 'Нет описания')
-    if 'from' in operation:
-        from_account = mask_card_number(operation['from'])
-    else:
-        from_account = 'Нет данных'
+    from_account = mask_card_number(operation.get('from', 'Нет данных'))
     to_account = mask_account_number(operation.get('to', 'Нет данных'))
     amount = operation.get('operationAmount', {}).get('amount', 'Нет данных')
     currency = operation.get('operationAmount', {}).get('currency', {}).get('name', 'Нет данных')
@@ -36,11 +32,5 @@ def print_last_transactions(file_path):
     sorted_operations = sorted(executed_operations, key=lambda x: datetime.strptime(x['date'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True)
     last_5_operations = sorted_operations[:5]
 
-    print("Сверху списка находятся самые последние операции (по дате):")
     for operation in last_5_operations:
         print_transaction(operation)
-
-if __name__ == "__main__":
-    file_dir = os.path.dirname(__file__)
-    file_path = os.path.join(file_dir, '../data/operations.json')
-    print_last_transactions(file_path)
