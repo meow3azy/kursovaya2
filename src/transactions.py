@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 from src.masked import mask_card_number, mask_account_number
 
@@ -10,18 +11,27 @@ def load_operations(file_path):
     except FileNotFoundError:
         print(f"File not found: {file_path}")
         return []
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from file: {file_path}")
+        return []
+
+
 
 def print_transaction(operation):
     date = datetime.strptime(operation['date'], '%Y-%m-%dT%H:%M:%S.%f').strftime('%d.%m.%Y')
     description = operation.get('description', 'Нет описания')
-    from_account = mask_card_number(operation.get('from', 'Нет данных'))
+    from_account = operation.get('from', 'Нет данных')
     to_account = mask_account_number(operation.get('to', 'Нет данных'))
     amount = operation.get('operationAmount', {}).get('amount', 'Нет данных')
     currency = operation.get('operationAmount', {}).get('currency', {}).get('name', 'Нет данных')
 
+    if from_account != 'Нет данных':
+        from_account = mask_card_number(from_account)
+
     print(f"{date} {description}")
-    print(f"{from_account} -> Счет {to_account}")
+    print(f"{from_account} -> {to_account}")
     print(f"{amount} {currency}\n")
+
 
 def print_last_transactions(file_path):
     operations = load_operations(file_path)
@@ -29,8 +39,10 @@ def print_last_transactions(file_path):
         return
 
     executed_operations = [op for op in operations if op.get('state') == 'EXECUTED']
-    sorted_operations = sorted(executed_operations, key=lambda x: datetime.strptime(x['date'], '%Y-%m-%dT%H:%M:%S.%f'), reverse=True)
+    sorted_operations = sorted(executed_operations, key=lambda x: datetime.strptime(x['date'], '%Y-%m-%dT%H:%M:%S.%f'),
+                               reverse=True)
     last_5_operations = sorted_operations[:5]
 
+    print("Сверху списка находятся самые последние операции (по дате):")
     for operation in last_5_operations:
         print_transaction(operation)
