@@ -1,8 +1,4 @@
 def mask_card_number(card_info):
-    """
-    Маскировка номера карты, отображающая полное название карты, первые 6 цифр, затем '** ****', затем последние 4 цифры.
-    Обеспечивает правильное форматирование.
-    """
     if not card_info or card_info == "Нет данных":
         return "Нет данных"
 
@@ -19,9 +15,6 @@ def mask_card_number(card_info):
 
 
 def mask_account_number(account_info):
-    """
-    Маскировка номера счета, отображающая только последние 4 цифры с префиксом '**'.
-    """
     if not account_info or account_info == "Нет данных":
         return "Нет данных"
 
